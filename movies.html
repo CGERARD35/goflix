@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Films</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1 {
+            color: #0275d8;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            
+            &:hover {
+                border-color: #0275d8;
+            }
+        }
+
+        strong {
+            font-size: 18px;
+        }
+
+        a {
+            color: #0275d8;
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+        .delete-btn {
+        cursor: pointer;
+        background-color: #ff4d4d; /* Rouge */
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 15px;
+        margin-left: 10px;
+        font-weight: bold;
+        text-transform: uppercase;
+        transition: background-color 0.3s ease;
+    }
+
+    .delete-btn:hover {
+        background-color: #cc0000; /* Rouge foncé */
+    }
+
+    .delete-btn:focus {
+        outline: none; /* Supprime le contour bleu par défaut lors du clic */
+    }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteButtons = document.querySelectorAll('.delete-btn');
+            
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const movieId = this.getAttribute('data-id');
+                    
+                    fetch(`/api/movies/${movieId}`, {
+                        method: 'DELETE',
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            // Supprime le film de la liste si la suppression a réussi
+                            this.parentNode.remove();
+                        } else {
+                            alert('Échec de la suppression du film.');
+                        }
+                    })
+                    .catch(error => console.error('Erreur:', error));
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Liste des Films</h1>
+    <ul>
+        {{range .}}
+        <li>
+            <strong>{{.Title}}</strong> - Sorti le : {{.ReleaseDate}}, Durée : {{.Duration}} minutes
+            <br>
+            Trailer: <a href="{{.TrailerURL}}">{{.TrailerURL}}</a>
+            <button class="delete-btn" data-id="{{.ID}}">Supprimer</button>
+        </li>
+        {{else}}
+        <li>Aucun film trouvé.</li>
+        {{end}}
+    </ul>
+</body>
+</html>
